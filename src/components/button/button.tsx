@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import './button.css'
 
-function Button({children, type}: {children: ReactNode, type: 'primary' | 'ghost' | 'danger'}) {
+const Button = ({children, type}: {children: ReactNode, type: 'primary' | 'ghost' | 'danger'}) => {
 
     const getClassName = (type: 'primary' | 'ghost' | 'danger') => {
         switch(type){
@@ -23,4 +23,4 @@ function Button({children, type}: {children: ReactNode, type: 'primary' | 'ghost
     )
 }
 
-export default Button
+export default Button;

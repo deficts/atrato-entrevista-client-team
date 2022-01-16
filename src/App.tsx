@@ -1,12 +1,12 @@
 import './App.css';
-import Button from './components/button/button'
+import ClientTable from './components/clientTable/clientTable';
+import logo from './imgs/ColorLogo.png';
 
 function App() {
   return (
     <div>
-      <Button type='ghost'>Ghost</Button>
-      <Button type='primary'>Primary</Button>
-      <Button type='danger'>Danger</Button>
+      <img src={logo} alt="Atrato logo" className='logo'></img>
+      <ClientTable/>
     </div>
   );
 }
