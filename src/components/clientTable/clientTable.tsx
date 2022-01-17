@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Edit, Trash } from 'react-feather';
+import { useMediaQuery } from 'react-responsive';
 import { ResponsiveCardTable, Content } from 'react-responsive-cards-table';
 import api from '../../api/api';
 import Button from '../button/button';
+import ClientCard from '../clientCard/clientCard';
 import Input from '../input/input';
 import Spinner from '../spinner/spinner';
 import StatusPill from '../statusPill/statusPill';
@@ -11,15 +13,23 @@ import './clientTable.css';
 const ClientTable = () => {
   const [isLoading, setisLoading] = useState(false);
   const [clients, setClients] = useState<Array<Client>>([]);
+  const isMobile = useMediaQuery({ maxWidth: 767 });
 
   useEffect(() => {
     performGetClients();
   }, []);
 
+  const renderCards = useMemo(() => {
+    return clients.map((client: Client) => {
+      return (
+        <ClientCard client={client}></ClientCard>
+      )})
+  }, [clients])
+
   const renderRows = useMemo(() => {
     return clients.map((client: Client) => {
       return (
-        <tr key={client.id}>
+        <tr key={client.id} className='table-border'>
           <td>
             <input type="checkbox" />
           </td>
@@ -31,7 +41,7 @@ const ClientTable = () => {
             {' '}
             <StatusPill type={client.status}></StatusPill>
           </td>
-          <td style={{textAlign: 'center'}}>
+          <td style={{ textAlign: 'center' }}>
             <Button type="danger">
               <Trash style={{ width: '16px', height: '16px' }}></Trash>
             </Button>
@@ -53,27 +63,39 @@ const ClientTable = () => {
   };
 
   return isLoading ? (
-    <div style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Spinner></Spinner>
     </div>
   ) : (
     <div className="container">
       <div className="header">
-        <div style={{width: 'fit-content', display: 'flex', alignItems: 'flex-end'}}>
-          <span className='title'>Clientes</span>
-          <Input placeholder='Buscar Clientes'/>
+        <div
+          className='title-wrapper'
+        >
+          <span className="title">Clientes</span>
+          <Input placeholder="Buscar Clientes" />
         </div>
-        <div style={{width: 'fit-content'}}>
-          <Button type="danger">
-            <Trash style={{ width: '16px', height: '16px' }}></Trash>
-          </Button>
-          <Button type="primary">Agregar Cliente</Button>
-        </div>
+        {!isMobile ? (
+          <div style={{ width: 'fit-content' }}>
+            <Button type="danger">
+              <Trash style={{ width: '16px', height: '16px' }}></Trash>
+            </Button>
+            <Button type="primary">Agregar Cliente</Button>
+          </div>
+        ) : null}
       </div>
       <ResponsiveCardTable>
         {({ isCard }: { isCard: boolean }) => {
           if (isCard) {
-            return <Content>Hola Mobile</Content>;
+            return <Content>
+              {renderCards}
+            </Content>;
           }
 
           return (
@@ -87,7 +109,7 @@ const ClientTable = () => {
                     <th>Email</th>
                     <th>Teléfono</th>
                     <th>Estatus</th>
-                    <th style={{textAlign: 'center'}}>Acciones</th>
+                    <th style={{ textAlign: 'center' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>{renderRows}</tbody>
