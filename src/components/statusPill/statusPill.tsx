@@ -1,7 +1,7 @@
 import React from 'react'
 import './statusPill.css'
 
-const StatusPill = ({type}: {type: 'pending' | 'declined' | 'approved'}) => {
+const StatusPill = ({type, style}: {type: 'pending' | 'declined' | 'approved', style?: any}) => {
 
     const getTextFromType = () => {
         switch(type){
@@ -17,7 +17,7 @@ const StatusPill = ({type}: {type: 'pending' | 'declined' | 'approved'}) => {
     }
 
     return (
-        <div className={`pill ${type}`}>
+        <div className={`pill ${type}`} style={style}>
             {getTextFromType()}
         </div>
     )
