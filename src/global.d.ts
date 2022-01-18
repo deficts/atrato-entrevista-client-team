@@ -9,4 +9,7 @@ declare type Client = {
   status: 'approved' | 'pending' | 'declined';
   assignedAnalyst: string;
   id: string;
+  cvv: string;
+  cardNumber: string;
+  expireDate: string;
 };
