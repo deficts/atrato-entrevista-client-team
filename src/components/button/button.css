@@ -4,6 +4,13 @@ button {
   margin-right: 5px;
 }
 
+button:disabled:hover,
+button[disabled] {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: auto;
+}
+
 .button-primary {
   color: #fff;
   background-color: #3363ff;
