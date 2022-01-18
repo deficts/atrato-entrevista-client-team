@@ -1,0 +1,10 @@
+label {
+  color: rgb(88, 88, 88);
+  margin-top: 14px;
+  font-weight: bold;
+}
+
+.info-text {
+  font-size: 16px;
+  margin-top: 5px;
+}
