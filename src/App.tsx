@@ -3,6 +3,7 @@ import './App.css';
 import ClientTable from './components/clientTable/clientTable';
 import logo from './imgs/ColorLogo.png';
 import icon from './imgs/ColorIcon.png';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -17,6 +18,7 @@ function App() {
         <img src={logo} alt="Atrato logo" className="logo"></img>
       )}
       <ClientTable />
+      <Toaster />
     </div>
   );
 }
