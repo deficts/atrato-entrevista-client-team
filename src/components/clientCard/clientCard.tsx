@@ -2,9 +2,9 @@ import React from 'react';
 import StatusPill from '../statusPill/statusPill';
 import './clientCard.css';
 
-const ClientCard = ({ client }: { client: Client }) => {
+const ClientCard = ({ client, setModalOpen }: { client: Client, setModalOpen: any}) => {
   return (
-    <div className="clientCard">
+    <div className="clientCard" onClick={()=>{setModalOpen(true)}}>
       <div className="status-wrapper">
         <StatusPill type={client.status}></StatusPill>
       </div>
