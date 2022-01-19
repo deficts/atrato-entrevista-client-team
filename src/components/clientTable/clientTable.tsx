@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Edit, Trash } from 'react-feather';
-import toast from 'react-hot-toast';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Edit, Plus, Trash } from 'react-feather';
 import { useMediaQuery } from 'react-responsive';
 import { ResponsiveCardTable, Content } from 'react-responsive-cards-table';
 import api from '../../api/api';
@@ -8,7 +7,6 @@ import Button from '../button/button';
 import ClientCard from '../clientCard/clientCard';
 import ClientModal from '../clientModal/clientModal';
 import ConfirmDeleteModal from '../confirmDeleteModal/confirmDeleteModal';
-import Input from '../input/input';
 import Spinner from '../spinner/spinner';
 import StatusPill from '../statusPill/statusPill';
 import './clientTable.css';
@@ -19,7 +17,11 @@ const ClientTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
-  const [currentClientsToDelete, setCurrentClientsToDelete] = useState<Array<Client>>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [currentClientsToDelete, setCurrentClientsToDelete] = useState<
+    Array<Client>
+  >([]);
   const [selectedClients, setSelectedClients] = useState<Array<Client>>([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -28,31 +30,60 @@ const ClientTable = () => {
     setCurrentClientsToDelete([]);
   }, []);
 
+  const manageClientChecked = useCallback(
+    (checked: boolean, client: Client) => {
+      if (checked) {
+        setSelectedClients((selectedClients) => [...selectedClients, client]);
+      } else {
+        const copy = [...selectedClients];
+        const index = selectedClients.findIndex((el) => el.id === client.id);
+        copy.splice(index, 1);
+        setSelectedClients(copy);
+      }
+    },
+    [selectedClients]
+  );
+
   const renderCards = useMemo(() => {
     return clients.map((client: Client) => {
       return (
-        <ClientCard client={client} setModalOpen={setIsModalOpen}></ClientCard>
+        <ClientCard
+          client={client}
+          setModalOpen={setIsModalOpen}
+          setCurrentClient={setCurrentClient}
+          setIsEditing={setIsEditing}
+          isSelecting={isSelecting}
+          manageClientChecked={manageClientChecked}
+        ></ClientCard>
       );
     });
-  }, [clients]);
+  }, [clients, isSelecting]);
 
-  const manageClientChecked = (checked: boolean, client: Client) => {
-    if(checked) {
-      setSelectedClients(selectedClients => [...selectedClients, client]);
-    } else {
-      const copy = [...selectedClients];
-      const index = selectedClients.findIndex((el)=>(el.id === client.id));
-      copy.splice(index,1);
-      setSelectedClients(copy);
-    }
-  }
+  const addNewClient = (client: Client) => {
+    const copy = [...clients, client];
+    setClients(copy);
+    setCurrentClient(null);
+  };
+
+  const updateClient = (client: Client) => {
+    const copy = [...clients];
+    const index = copy.findIndex((el) => el.id === client.id);
+    copy[index] = client;
+    setClients(copy);
+  };
 
   const renderRows = useMemo(() => {
     return clients.map((client: Client, index: number) => {
       return (
         <tr key={client.id} className="table-border">
           <td>
-            <input type="checkbox" style={{ marginRight: '16px' }} onChange={(ev)=>{manageClientChecked(ev.target.checked, client)}}/>
+            <input
+              type="checkbox"
+              style={{ marginRight: '16px' }}
+              onChange={(ev) => {
+                manageClientChecked(ev.target.checked, client);
+              }}
+            />
           </td>
           <td>{client.id}</td>
           <td>{`${client.name} ${client.lastName}`}</td>
@@ -71,13 +102,21 @@ const ClientTable = () => {
             >
               <Trash style={{ width: '16px', height: '16px' }}></Trash>
             </Button>
-            <Button type="ghost" onClick={()=>{toast('hola!')}}>
+            <Button
+              type="ghost"
+              onClick={() => {
+                setCurrentClient(client);
+                setIsModalOpen(true);
+                setIsEditing(true);
+              }}
+            >
               <Edit style={{ width: '16px', height: '16px' }}></Edit>
             </Button>
             <Button
               type="primary"
               onClick={() => {
                 setCurrentClient(client);
+                setIsEditing(false);
                 setIsModalOpen(true);
               }}
             >
@@ -87,7 +126,7 @@ const ClientTable = () => {
         </tr>
       );
     });
-  }, [clients]);
+  }, [clients, manageClientChecked]);
 
   const performGetClients = async () => {
     setisLoading(true);
@@ -97,11 +136,11 @@ const ClientTable = () => {
   };
 
   const removeClients = () => {
-    const newClients = clients.filter(el =>
-      !currentClientsToDelete.find(del => del.id === el.id)
-    )
+    const newClients = clients.filter(
+      (el) => !currentClientsToDelete.find((del) => del.id === el.id)
+    );
     setClients(newClients);
-  }
+  };
 
   return isLoading ? (
     <div
@@ -118,8 +157,11 @@ const ClientTable = () => {
       <ClientModal
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
-        isEditing={false}
+        isEditing={isEditing}
         client={currentClient}
+        updateClient={updateClient}
+        addNewClient={addNewClient}
+        setIsEditing={setIsEditing}
       ></ClientModal>
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
@@ -131,7 +173,6 @@ const ClientTable = () => {
         <div className="header">
           <div className="title-wrapper">
             <span className="title">Clientes</span>
-            <Input placeholder="Buscar Clientes" />
           </div>
           {!isMobile ? (
             <div style={{ width: 'fit-content' }}>
@@ -141,13 +182,56 @@ const ClientTable = () => {
                   setIsDeleteModalOpen(true);
                   setCurrentClientsToDelete(selectedClients);
                 }}
-                disabled = {selectedClients.length < 1}
+                disabled={selectedClients.length < 1}
               >
                 <Trash style={{ width: '16px', height: '16px' }}></Trash>
               </Button>
-              <Button type="primary">Agregar Cliente</Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setCurrentClient(null);
+                  setIsEditing(false);
+                  setIsModalOpen(true);
+                }}
+              >
+                Agregar Cliente
+              </Button>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <Button
+                type="secondary"
+                style={{ marginTop: '6px' }}
+                onClick={() => {
+                  setIsSelecting(!isSelecting);
+                }}
+              >
+                {isSelecting ? 'Listo' : 'Seleccionar'}
+              </Button>
+              <div className="fab-container">
+                <Button
+                  type="danger"
+                  onClick={() => {
+                    setIsDeleteModalOpen(true);
+                    setCurrentClientsToDelete(selectedClients);
+                  }}
+                  disabled={selectedClients.length < 1}
+                >
+                  <Trash></Trash>
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setCurrentClient(null);
+                    setIsEditing(false);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <Plus></Plus>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
         <ResponsiveCardTable>
           {({ isCard }: { isCard: boolean }) => {

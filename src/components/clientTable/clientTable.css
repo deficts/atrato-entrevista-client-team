@@ -62,3 +62,10 @@ th {
   text-align: start;
   border-bottom: 2px, solid, black;
 }
+
+.fab-container {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  cursor: pointer;
+}
