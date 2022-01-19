@@ -9,12 +9,12 @@ const Button = ({
   disabled
 }: {
   children: ReactNode;
-  type: 'primary' | 'ghost' | 'danger';
+  type: 'primary' | 'ghost' | 'danger' | 'secondary';
   onClick?: any;
   style?: any;
   disabled?: boolean
 }) => {
-  const getClassName = (type: 'primary' | 'ghost' | 'danger') => {
+  const getClassName = (type: 'primary' | 'ghost' | 'danger' | 'secondary') => {
     switch (type) {
       case 'primary':
         return 'button-primary';
@@ -22,6 +22,8 @@ const Button = ({
         return 'button-ghost';
       case 'danger':
         return 'button-danger';
+      case 'secondary':
+        return 'button-secondary';
       default:
         return 'button-primary';
     }
