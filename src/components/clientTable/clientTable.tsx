@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edit, Plus, Trash } from 'react-feather';
+import { ChevronDown, ChevronUp, Edit, Plus, Trash } from 'react-feather';
 import { useMediaQuery } from 'react-responsive';
 import { ResponsiveCardTable, Content } from 'react-responsive-cards-table';
 import api from '../../api/api';
+import { useDebounce } from '../../hooks/useDebounce';
 import Button from '../button/button';
 import ClientCard from '../clientCard/clientCard';
 import ClientModal from '../clientModal/clientModal';
@@ -24,28 +25,70 @@ const ClientTable = () => {
   >([]);
   const [selectedClients, setSelectedClients] = useState<Array<Client>>([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const [debouncedSearch, search, setSearch] = useDebounce('');
+  const [filter, setFilter] = useState<'id' | 'status' | 'name'>('id');
+  const [filterDirection, setFilterDirection] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     performGetClients();
     setCurrentClientsToDelete([]);
   }, []);
 
+  const setNewFilter = (newFilter: 'id' | 'status' | 'name') => {
+    if (newFilter !== filter) {
+      setFilter(newFilter);
+    } else {
+      setFilterDirection(filterDirection === 'asc' ? 'desc' : 'asc');
+    }
+  };
+
+  const filteredClients = useMemo(() => {
+    return clients.filter(
+      (client) =>
+        client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        client.id?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        client.status.toLowerCase().includes(debouncedSearch.toLowerCase())
+    ).sort((a,b)=>{
+      if(filter === 'id'){
+        if(filterDirection === 'asc'){
+          return Number(a.id) < Number(b.id) ? 1 : -1
+        }
+        else{
+          return Number(a.id) > Number(b.id) ? 1 : -1
+        }
+      } else{
+        if(filterDirection === 'asc'){
+          return (a[filter] ?? '') < (b[filter] ?? '') ? 1 : -1;
+        } else {
+          return (a[filter] ?? '') > (b[filter] ?? '') ? 1 : -1;
+        }
+      }      
+    })
+  }, [debouncedSearch, clients, filter, filterDirection]);
+
   const manageClientChecked = useCallback(
     (checked: boolean, client: Client) => {
       if (checked) {
         setSelectedClients((selectedClients) => [...selectedClients, client]);
       } else {
-        const copy = [...selectedClients];
-        const index = selectedClients.findIndex((el) => el.id === client.id);
-        copy.splice(index, 1);
-        setSelectedClients(copy);
+        const newSelectedClients = selectedClients.filter((el) => {
+          return client.id !== el.id;
+        });
+        setSelectedClients(newSelectedClients);
       }
     },
     [selectedClients]
   );
 
+  const onSelectCard = useCallback(
+    (client: Client, checked: boolean) => {
+      manageClientChecked(checked, client);
+    },
+    [manageClientChecked]
+  );
+
   const renderCards = useMemo(() => {
-    return clients.map((client: Client) => {
+    return filteredClients.map((client: Client) => {
       return (
         <ClientCard
           client={client}
@@ -53,11 +96,11 @@ const ClientTable = () => {
           setCurrentClient={setCurrentClient}
           setIsEditing={setIsEditing}
           isSelecting={isSelecting}
-          manageClientChecked={manageClientChecked}
+          onSelect={onSelectCard}
         ></ClientCard>
       );
     });
-  }, [clients, isSelecting]);
+  }, [filteredClients, isSelecting, onSelectCard]);
 
   const addNewClient = (client: Client) => {
     const copy = [...clients, client];
@@ -73,7 +116,7 @@ const ClientTable = () => {
   };
 
   const renderRows = useMemo(() => {
-    return clients.map((client: Client, index: number) => {
+    return filteredClients.map((client: Client, index: number) => {
       return (
         <tr key={client.id} className="table-border">
           <td>
@@ -126,7 +169,7 @@ const ClientTable = () => {
         </tr>
       );
     });
-  }, [clients, manageClientChecked]);
+  }, [filteredClients, manageClientChecked]);
 
   const performGetClients = async () => {
     setisLoading(true);
@@ -173,6 +216,13 @@ const ClientTable = () => {
         <div className="header">
           <div className="title-wrapper">
             <span className="title">Clientes</span>
+            {isMobile ? null : (
+              <input
+                placeholder="Buscar..."
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+              ></input>
+            )}
           </div>
           {!isMobile ? (
             <div style={{ width: 'fit-content' }}>
@@ -233,6 +283,14 @@ const ClientTable = () => {
             </div>
           )}
         </div>
+        {isMobile ? (
+          <input
+            placeholder="Buscar..."
+            onChange={(e) => setSearch(e.target.value)}
+            value={search}
+            style={{ marginBottom: '16px' }}
+          ></input>
+        ) : null}
         <ResponsiveCardTable>
           {({ isCard }: { isCard: boolean }) => {
             if (isCard) {
@@ -245,11 +303,53 @@ const ClientTable = () => {
                   <thead>
                     <tr>
                       <th></th>
-                      <th>ID</th>
-                      <th>Nombre</th>
+                      <th
+                        onClick={() => {
+                          setNewFilter('id');
+                        }}
+                        className='pointer'
+                      >
+                        ID
+                        {filter === 'id' ? (
+                          filterDirection === 'asc' ? (
+                            <ChevronUp width={16} height={16}></ChevronUp>
+                          ) : (
+                            <ChevronDown width={16} height={16}></ChevronDown>
+                          )
+                        ) : null}
+                      </th>
+                      <th
+                        onClick={() => {
+                          setNewFilter('name');
+                        }}
+                        className='pointer'
+                      >
+                        Nombre
+                        {filter === 'name' ? (
+                          filterDirection === 'asc' ? (
+                            <ChevronUp width={16} height={16}></ChevronUp>
+                          ) : (
+                            <ChevronDown width={16} height={16}></ChevronDown>
+                          )
+                        ) : null}
+                      </th>
                       <th>Email</th>
                       <th>Teléfono</th>
-                      <th>Estatus</th>
+                      <th
+                        onClick={() => {
+                          setNewFilter('status');
+                        }}
+                        className='pointer'
+                      >
+                        Estatus
+                        {filter === 'status' ? (
+                          filterDirection === 'asc' ? (
+                            <ChevronUp width={16} height={16}></ChevronUp>
+                          ) : (
+                            <ChevronDown width={16} height={16}></ChevronDown>
+                          )
+                        ) : null}
+                      </th>
                       <th style={{ textAlign: 'center' }}>Acciones</th>
                     </tr>
                   </thead>
