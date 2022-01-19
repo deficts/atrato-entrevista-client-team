@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Check, Circle } from 'react-feather';
 import StatusPill from '../statusPill/statusPill';
 import './clientCard.css';
@@ -9,24 +9,21 @@ const ClientCard = ({
   setCurrentClient,
   setIsEditing,
   isSelecting,
-  manageClientChecked
+  onSelect
 }: {
   client: Client;
   setModalOpen: any;
   setCurrentClient: any;
   setIsEditing: any;
   isSelecting: any;
-  manageClientChecked: (checked: boolean, client: Client) => void
+  onSelect: (client:Client, checked: boolean) => void
 }) => {
   const [isSelected, setIsSelected] = useState(false);
 
-  const toggleSelect = () => {
-    setIsSelected(!isSelected, );
+  const toggleSelect = ()=>{
+    onSelect(client, !isSelected);
+    setIsSelected(!isSelected);
   }
-
-  useEffect(() => {
-    manageClientChecked(isSelected, client);
-  }, [isSelected, client, manageClientChecked])
 
   return (
     <div className="wrapper">
@@ -67,7 +64,11 @@ const ClientCard = ({
       </div>
       {isSelecting ? (
         <div className="checkboxWrapper" onClick={toggleSelect}>
-          {isSelected ?  <Check color='#3363ff'></Check> : <Circle color='grey'></Circle>}
+          {isSelected ? (
+            <Check color="#3363ff"></Check>
+          ) : (
+            <Circle color="grey"></Circle>
+          )}
         </div>
       ) : null}
     </div>
