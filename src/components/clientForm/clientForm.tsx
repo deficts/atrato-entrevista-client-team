@@ -138,9 +138,9 @@ const ClientForm = ({
 
           <label>Estatus</label>
           <select {...register('status')}>
-            <option value="aprobado">Aprobado</option>
+            <option value="completado">Completado</option>
             <option value="pendiente">Pendiente</option>
-            <option value="rechazado">Rechazado</option>
+            <option value="en proceso">En Proceso</option>
           </select>
 
           <label>Número de Tarjeta</label>
