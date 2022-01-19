@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, Edit, Plus, Trash } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useMediaQuery } from 'react-responsive';
 import { ResponsiveCardTable, Content } from 'react-responsive-cards-table';
 import api from '../../api/api';
@@ -43,27 +44,28 @@ const ClientTable = () => {
   };
 
   const filteredClients = useMemo(() => {
-    return clients.filter(
-      (client) =>
-        client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        client.id?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        client.status.toLowerCase().includes(debouncedSearch.toLowerCase())
-    ).sort((a,b)=>{
-      if(filter === 'id'){
-        if(filterDirection === 'asc'){
-          return Number(a.id) < Number(b.id) ? 1 : -1
-        }
-        else{
-          return Number(a.id) > Number(b.id) ? 1 : -1
-        }
-      } else{
-        if(filterDirection === 'asc'){
-          return (a[filter] ?? '') < (b[filter] ?? '') ? 1 : -1;
+    return clients
+      .filter(
+        (client) =>
+          client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          client.id?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          client.status.toLowerCase().includes(debouncedSearch.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (filter === 'id') {
+          if (filterDirection === 'asc') {
+            return Number(a.id) < Number(b.id) ? 1 : -1;
+          } else {
+            return Number(a.id) > Number(b.id) ? 1 : -1;
+          }
         } else {
-          return (a[filter] ?? '') > (b[filter] ?? '') ? 1 : -1;
+          if (filterDirection === 'asc') {
+            return (a[filter] ?? '') < (b[filter] ?? '') ? 1 : -1;
+          } else {
+            return (a[filter] ?? '') > (b[filter] ?? '') ? 1 : -1;
+          }
         }
-      }      
-    })
+      });
   }, [debouncedSearch, clients, filter, filterDirection]);
 
   const manageClientChecked = useCallback(
@@ -173,9 +175,14 @@ const ClientTable = () => {
 
   const performGetClients = async () => {
     setisLoading(true);
-    const res = await api.get('clients');
-    setClients(res.data);
-    setisLoading(false);
+    try {
+      const res = await api.get('clients');
+      setClients(res.data);
+      setisLoading(false);
+    } catch (error) {
+      setisLoading(false);
+      toast.error('Ocurrió un error al cargar los clientes');
+    }
   };
 
   const removeClients = () => {
@@ -307,7 +314,7 @@ const ClientTable = () => {
                         onClick={() => {
                           setNewFilter('id');
                         }}
-                        className='pointer'
+                        className="pointer"
                       >
                         ID
                         {filter === 'id' ? (
@@ -322,7 +329,7 @@ const ClientTable = () => {
                         onClick={() => {
                           setNewFilter('name');
                         }}
-                        className='pointer'
+                        className="pointer"
                       >
                         Nombre
                         {filter === 'name' ? (
@@ -339,7 +346,7 @@ const ClientTable = () => {
                         onClick={() => {
                           setNewFilter('status');
                         }}
-                        className='pointer'
+                        className="pointer"
                       >
                         Estatus
                         {filter === 'status' ? (
