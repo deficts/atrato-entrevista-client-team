@@ -1,6 +1,7 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 import Modal from 'react-modal';
+import { useMediaQuery } from 'react-responsive';
 import api from '../../api/api';
 import Button from '../button/button';
 import './confirmDeleteModal.css';
@@ -9,13 +10,15 @@ const ConfirmDeleteModal = ({
   clients,
   isOpen,
   setIsOpen,
-  removeClients
+  removeClients,
 }: {
   clients: Client[];
   isOpen: boolean;
   setIsOpen: any;
   removeClients: any;
 }) => {
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  
   const onConfirm = async () => {
     setIsOpen(false);
     toast.promise(deleteClients(), {
@@ -26,15 +29,15 @@ const ConfirmDeleteModal = ({
   };
 
   const deleteClients = async () => {
-      try {
-        for (let client of clients) {
-            await api.delete(`clients/${client.id}`);
-        }
-        removeClients()
-      } catch (error) {
-        console.log(error);
-        throw error;   
+    try {
+      for (let client of clients) {
+        await api.delete(`clients/${client.id}`);
       }
+      removeClients();
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   };
 
   return (
@@ -46,9 +49,9 @@ const ConfirmDeleteModal = ({
         content: {
           border: 'none',
           borderRadius: 10,
+          width: isMobile ? '70%' : 'fit-content',
           height: 'fit-content',
           margin: '0 auto',
-          width: 'fit-content',
         },
         overlay: { background: 'rgb(0,0,0,.16)' },
       }}
