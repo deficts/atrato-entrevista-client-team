@@ -12,17 +12,17 @@
   border-radius: 100px;
 }
 
-.declined {
+.rechazado {
   background-color: #f00;
   color: #fff;
 }
 
-.approved {
+.aprobado {
   background-color: green;
   color: #fff;
 }
 
-.pending {
+.pendiente {
   background-color: orange;
   color: #fff;
 }
