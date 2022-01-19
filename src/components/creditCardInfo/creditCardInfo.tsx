@@ -15,8 +15,9 @@ const CreditCardInfo = ({
   
   return (
     <div className="credit-card-info-wrapper" style={{
-      marginLeft: isMobile ? 0 : '128px',
-      marginTop: isMobile ? '16px' : 0
+      marginLeft: isMobile ? 0 : '64px',
+      marginTop: isMobile ? '16px' : 0,
+      width: '90%'
     }}>
       <label>Número de Tarjeta</label>
       <span className="info-text">{cardNumber}</span>
