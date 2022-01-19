@@ -4,6 +4,13 @@ button {
   margin-right: 5px;
 }
 
+button:disabled:hover,
+button[disabled] {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: auto;
+}
+
 .button-primary {
   color: #fff;
   background-color: #3363ff;
@@ -56,4 +63,22 @@ button {
 
 .button-danger:active {
   background-color: rgb(184, 0, 0);
+}
+
+.button-secondary {
+  color: #000;
+  background-color: #f8f8f9;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button-secondary:hover {
+  background-color: #f7f7f7;
+}
+
+.button-secondary:active {
+  background-color: #f0f0f0;
 }

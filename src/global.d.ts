@@ -6,7 +6,10 @@ declare type Client = {
   name: string;
   lastName: string;
   dateOfBirth: string;
-  status: 'approved' | 'pending' | 'declined';
+  status: 'aprobado' | 'pendiente' | 'rechazado';
   assignedAnalyst: string;
-  id: string;
+  id?: string;
+  cvv: string;
+  cardNumber: string;
+  expireDate: string;
 };
