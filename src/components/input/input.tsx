@@ -1,9 +1,9 @@
 import React from 'react'
 import './input.css';
 
-const Input = ({placeholder}: {placeholder: string}) => {
+const Input = ({value, placeholder, onChange, style}: {value: string, placeholder: string, onChange: any, style?: any}) => {
     return (
-        <input type="text" placeholder={placeholder}/>
+        <input style={style} type="text" placeholder={placeholder} onChange={(ev)=>{onChange(ev.target.value)}} value={value}/>
     )
 }
 
