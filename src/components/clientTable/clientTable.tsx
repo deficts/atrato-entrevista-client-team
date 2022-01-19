@@ -47,7 +47,7 @@ const ClientTable = () => {
     return clients
       .filter(
         (client) =>
-          client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          `${client.name} ${client.lastName}`.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
           client.id?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
           client.status.toLowerCase().includes(debouncedSearch.toLowerCase())
       )
