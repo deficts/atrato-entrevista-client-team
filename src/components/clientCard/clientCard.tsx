@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Check, Circle } from 'react-feather';
 import StatusPill from '../statusPill/statusPill';
 import './clientCard.css';
@@ -9,7 +9,7 @@ const ClientCard = ({
   setCurrentClient,
   setIsEditing,
   isSelecting,
-  onSelect
+  onSelect,
 }: {
   client: Client;
   setModalOpen: any;
@@ -19,6 +19,10 @@ const ClientCard = ({
   onSelect: (client:Client, checked: boolean) => void
 }) => {
   const [isSelected, setIsSelected] = useState(false);
+
+  useEffect(() => {
+    setIsSelected(false);
+  }, [isSelecting])
 
   const toggleSelect = ()=>{
     onSelect(client, !isSelected);

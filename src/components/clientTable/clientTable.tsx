@@ -35,6 +35,10 @@ const ClientTable = () => {
     setCurrentClientsToDelete([]);
   }, []);
 
+  useEffect(() => {
+    setSelectedClients([]);
+  }, [isSelecting])
+
   const setNewFilter = (newFilter: 'id' | 'status' | 'name') => {
     if (newFilter !== filter) {
       setFilter(newFilter);
@@ -190,6 +194,7 @@ const ClientTable = () => {
       (el) => !currentClientsToDelete.find((del) => del.id === el.id)
     );
     setClients(newClients);
+    setIsSelecting(false);
   };
 
   return isLoading ? (
