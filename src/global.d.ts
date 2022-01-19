@@ -8,7 +8,7 @@ declare type Client = {
   dateOfBirth: string;
   status: 'approved' | 'pending' | 'declined';
   assignedAnalyst: string;
-  id: string;
+  id?: string;
   cvv: string;
   cardNumber: string;
   expireDate: string;
